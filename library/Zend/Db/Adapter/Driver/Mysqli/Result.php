@@ -3,41 +3,48 @@
 namespace Zend\Db\Adapter\Driver\Mysqli;
 use Zend\Db\Adapter\Driver;
 
-class Result implements Driver\ResultInterface
+class Result implements \Iterator, Driver\ResultInterface
 {
-	protected $_driver = null;
-	protected $_resource = null;
-	protected $_data = null;
-	protected $_pointerPosition = 0;
-	protected $_numberOfRows = -1;
-	protected $_nextImpliedByCurrent = false;
-	protected $_loadedRows = 0;
+    /**
+     * @var Zend\Db\Adapter\Driver\AbstractDriver
+     */
+	protected $driver = null;
+	
+	/**
+	 * @var \mysqli_result
+	 */
+	protected $resource = null;
+	protected $data = array();
+	protected $pointerPosition = 0;
+	protected $numberOfRows = -1;
+	protected $nextImpliedByCurrent = false;
+	protected $loadedRows = 0;
 	
 	public function __construct(Driver\AbstractDriver $driver, array $defaultOptions, \mysqli_result $mysqliResult = null)
 	{
-	   $this->_driver = $driver; 
-	   $this->_resource = $mysqliResult;
-	   $this->_numberOfRows = $mysqliResult->num_rows;
+	   $this->driver = $driver; 
+	   $this->resource = $mysqliResult;
+	   $this->numberOfRows = $mysqliResult->num_rows;
 	}
 	
 	public function getResource()
 	{
-		return $this->_resource;
+		return $this->resource;
 	}
 	
 	public function current()
 	{
-	    if ($this->_pointerPosition > ($this->_numberOfRows-1)) {
+	    if ($this->pointerPosition > ($this->numberOfRows-1)) {
 	        throw new \OutOfRangeException('Attempting to access a row that is outside of the number of rows in this result.');
 	    }
 	    
-        $pointer = $this->_pointerPosition;
+        $pointer = $this->pointerPosition;
 	    
-		if (!array_key_exists($this->_pointerPosition, $this->_data[$this->_pointerPosition])) {
-		    $this->_data[$this->_pointerPosition] = $this->_resource->fetch_array(\MYSQLI_ASSOC);
-		    $this->_pointerPosition++;
-		    $this->_nextImpliedByCurrent = true;
-		    $this->_loadedRows++;
+		if (!array_key_exists($this->pointerPosition, $this->data)) {
+		    $this->data[$this->pointerPosition] = $this->resource->fetch_array(\MYSQLI_ASSOC);
+		    $this->pointerPosition++;
+		    $this->nextImpliedByCurrent = true;
+		    $this->loadedRows++;
 		    /** 
 		     * @todo determine if this is a smart thing to do 
 		    if ($this->_loadedRows == $this->_numberOfRows) {
@@ -46,36 +53,36 @@ class Result implements Driver\ResultInterface
 		    */
 		}
 		
-		return $this->_data[$pointer];
+		return $this->data[$pointer];
 	}
 	
 	public function next()
 	{
-	    if ($this->_nextImpliedByCurrent == false) {
-	        $this->_pointerPosition++;
+	    if ($this->nextImpliedByCurrent == false) {
+	        $this->pointerPosition++;
 	    }
-		$this->_nextImpliedByCurrent = false;
+		$this->nextImpliedByCurrent = false;
 	}
 	
 	public function key()
 	{
-		return $this->_pointerPosition;
+		return $this->pointerPosition;
 	}
 	
 	public function rewind()
 	{
-	    $this->_pointerPosition = 0;
-		$this->_resource->data_seek(0);
+	    $this->pointerPosition = 0;
+		$this->resource->data_seek(0);
 	}
 	
 	public function valid()
 	{
-		return ($this->_pointerPosition < $this->_numberOfRows);
+		return ($this->pointerPosition < $this->numberOfRows);
 	}
 	
 	public function count()
 	{
-		return $this->_numberOfRows;
+		return $this->numberOfRows;
 	}
 	
 }

@@ -8,23 +8,44 @@ class Connection implements Driver\ConnectionInterface
 	/**
 	 * @var \Zend\Db\Adapter\Driver\DriverAbstract
 	 */
-	protected $_driver = null;
+	protected $driver = null;
 	
-	protected $_connectionParams = array();
+	protected $connectionParams = array();
 	
 	/**
 	 * @var \mysqli
 	 */
-    protected $_resource = null;
+    protected $resource = null;
 
-    protected $_inTransaction = false;
+    protected $inTransaction = false;
     
-    protected $_openMysqliResultSets = array();
+    protected $openMysqliResultSets = array();
     
     public function __construct(Driver\AbstractDriver $driver, array $connectionParameters)
     {
-        $this->_driver = $driver;
-        $this->_connectionParams = $connectionParameters;
+        $this->driver = $driver;
+        $this->connectionParams = $connectionParameters;
+    }
+    
+    public function getConnectionParams()
+    {
+        return $this->connectionParams;
+    }
+    
+    public function getDefaultCatalog()
+    {
+        return null;
+    }
+    
+    public function getDefaultSchema()
+    {
+        if (!$this->isConnected()) {
+            $this->connect();
+        }
+        
+        $result = $this->resource->query('SELECT DATABASE()');
+        $r = $result->fetch_row();
+        return $r[0];
     }
     
     /**
@@ -32,70 +53,70 @@ class Connection implements Driver\ConnectionInterface
      */
     public function getResource()
     {
-    	return $this->_resource;
+    	return $this->resource;
     }
     
     public function connect()
     {
-        if ($this->_resource) {
+        if ($this->resource) {
             return;
         }
 
         $host = $username = $password = $dbname = $port = $socket = null;
         foreach (array('host', 'username', 'password', 'dbname', 'port', 'socket') as $c) {
-        	if (isset($this->_connectionParams[$c])) {
+        	if (isset($this->connectionParams[$c])) {
                 switch ($c) {
                     case 'port': 
-                        $this->_connectionParams[$c] = (int) $this->_connectionParams[$c];
+                        $this->connectionParams[$c] = (int) $this->connectionParams[$c];
                     default:
-                        $$c = $this->_connectionParams[$c];
+                        $$c = $this->connectionParams[$c];
                 }
         	}
         }
         
-        $this->_resource = new \mysqli($host, $username, $password, $dbname, $port, $socket);
+        $this->resource = new \Mysqli($host, $username, $password, $dbname, $port, $socket);
 
-        if ($this->_resource->connect_error) {
-            throw new \Exception('Connect Error (' . $this->_resource->connect_errno . ') ' . $this->_resource->connect_error);
+        if ($this->resource->connect_error) {
+            throw new \Exception('Connect Error (' . $this->resource->connect_errno . ') ' . $this->resource->connect_error);
         }
 
-        if (!empty($this->_connectionParams['charset'])) {
-            $this->_resource->set_charset($this->_resource, $this->_connectionParams['charset']);
+        if (!empty($this->connectionParams['charset'])) {
+            $this->resource->set_charset($this->resource, $this->connectionParams['charset']);
         }
 
     }
     
     public function isConnected()
     {
-    	return ($this->_resource instanceof Mysqli);
+    	return ($this->resource instanceof Mysqli);
     }
     
     public function disconnect()
     {
-        $this->_resource->close();
-    	unset($this->_resource);
+        $this->resource->close();
+    	unset($this->resource);
     }
     
     public function beginTransaction()
     {
-        $this->_resource->autocommit(false);
-        $this->_inTransaction = true;
+        $this->resource->autocommit(false);
+        $this->inTransaction = true;
     }
     
     public function commit()
     {
-        if (!$this->_resource) {
+        if (!$this->resource) {
             $this->connect();
         }
         
-        $this->_resource->commit();
+        $this->resource->commit();
         
-        $this->_inTransaction = false;
+        $this->inTransaction = false;
     }
     
     public function rollback()
     {
-        if (!$this->_resource) {
+        if (!$this->resource) {
             throw new \Exception('Must be connected before you can rollback.');
         }
         
@@ -103,24 +124,24 @@ class Connection implements Driver\ConnectionInterface
             throw new \Exception('Must call commit() before you can rollback.');
         }
         
-        $this->_resource->rollback();
+        $this->resource->rollback();
         return $this;
     }
     
     
     public function execute($sql)
     {
-    	if (!$this->_resource) {
+    	if (!$this->isConnected()) {
     		$this->connect();
     	}
     	
-    	$resultClass = $this->_driver->getResultClass();
+    	$resultClass = $this->driver->getResultClass();
     	
-    	$returnValue = $this->_resource->query($sql);
+    	$returnValue = $this->resource->query($sql);
     	
     	if ($returnValue instanceof \mysqli_result) {
-            $this->_openMysqliResultSets[] = $result = new \Zend\Db\ResultSet\ResultSet(
-               new $resultClass($this->_driver, array(), $returnValue)
+            $this->openMysqliResultSets[] = $result = new \Zend\Db\ResultSet\ResultSet(
+               new $resultClass($this->driver, array(), $returnValue)
                );
             return $result;
     	}
@@ -130,13 +151,13 @@ class Connection implements Driver\ConnectionInterface
     
     public function prepare($sql)
     {
-        if (!$this->_resource) {
+        if (!$this->isConnected()) {
             $this->connect();
         }
         
-        $statementClass = $this->_driver->getStatementClass();
+        $statementClass = $this->driver->getStatementClass();
         
-        $statement = new $statementClass($this->_driver, array(), $this->_resource->prepare($sql));
+        $statement = new $statementClass($this->driver, array(), $this->resource->prepare($sql));
 
         return $statement;
     }

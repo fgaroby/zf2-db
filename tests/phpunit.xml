@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="./Bootstrap.php">
+    <testsuites>
+        <testsuite name="Zend\Db Adpater Test Suite">
+            <file>ZendTest/Db/TestSuite.php</file>
+        </testsuite>
+    </testsuites>
+    
+    
+    <listeners>
+        <listener class="ZendTest\Db\TestAsset\TestListener" file="ZendTest/Db/TestAsset/TestListener.php" />
+    </listeners>
+
+
+
+</phpunit>

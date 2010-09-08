@@ -6,24 +6,25 @@ use Zend\Db\Adapter\Driver;
 
 class Adapter
 {
-
+    const QUERY_EXECUTE = 'queryExecute';
+    const QUERY_PREPARE = 'queryPrepare';
     
     const DEFAULT_DRIVER_NAMESPACE = '\Zend\Db\Adapter\Driver';
     
 	/**
 	 * @var string
 	 */
-	protected $_name = null;
+	protected $name = null;
 	
 	/**
 	 * @var \Zend\Db\Adapter\Driver\DriverInterface
 	 */
-    protected $_driver = null;
+    protected $driver = null;
     
     /**
      * @var \Zend\Db\Adapter\Driver\ConnectionInterface
      */
-    protected $_connection = null;
+    protected $connection = null;
     
     public function __construct($options = array())
     {
@@ -53,7 +54,7 @@ class Adapter
      */
     public function setName($name)
     {
-    	$this->_name = $name;
+    	$this->name = $name;
     	return $this;
     }
     
@@ -64,7 +65,7 @@ class Adapter
      */
     public function getName()
     {
-    	return $this->_name;
+    	return $this->name;
     }
     
     /**
@@ -100,7 +101,7 @@ class Adapter
         	$driver->setOptions($driverOptions);
         }
         
-        $this->_driver = $driver;
+        $this->driver = $driver;
         return $this;
     }
     
@@ -112,10 +113,10 @@ class Adapter
      */
     public function getDriver()
     {
-    	if ($this->_driver == null) {
+    	if ($this->driver == null) {
     		throw new \Exception('Driver has not been set.');
     	}
-    	return $this->_driver;
+    	return $this->driver;
     }
     
     /**
@@ -125,7 +126,7 @@ class Adapter
      */
     public function setConnection(Driver\ConnectionInterface $connection)
     {
-    	$this->_connection = $connection;
+    	$this->connection = $connection;
     	return $this;
     }
     
@@ -139,13 +140,18 @@ class Adapter
      */
     public function getConnection()
     {
-    	if ($this->_connection == null) {
+    	if ($this->connection == null) {
     		$driver = $this->getDriver();
 	    	$connectionClass = $driver->getConnectionClass();
-	        $this->setConnection(new $connectionClass($driver, $this->_driver->getConnectionParams()));
+	        $this->setConnection(new $connectionClass($driver, $this->driver->getConnectionParams()));
     	}
-    	return $this->_connection;
+    	return $this->connection;
     }
 
-    
+    public function query($sql, $prepareOrExecute = self::QUERY_PREPARE)
+    {
+        $c = $this->getConnection();
+        return ($prepareOrExecute == self::QUERY_EXECUTE) ? $c->execute($sql) : $c->prepare($sql);
+    }
+
 }

@@ -5,9 +5,18 @@ use Zend\Db\Adapter\Driver;
 
 class Mysqli extends Driver\AbstractDriver
 {
-    protected $_connectionClass = '\Zend\Db\Adapter\Driver\Mysqli\Connection';
-    protected $_statementClass = '\Zend\Db\Adapter\Driver\Mysqli\Statement';
-    protected $_resultClass = '\Zend\Db\Adapter\Driver\Mysqli\Result';
+    protected $connectionClass = '\Zend\Db\Adapter\Driver\Mysqli\Connection';
+    protected $statementClass = '\Zend\Db\Adapter\Driver\Mysqli\Statement';
+    protected $resultClass = '\Zend\Db\Adapter\Driver\Mysqli\Result';
+    
+    public function getDatabaseVendor($nameFormat = self::NAME_FORMAT_CAMELCASE)
+    {
+        if ($nameFormat == self::NAME_FORMAT_CAMELCASE) {
+            return 'Mysql';
+        } else {
+            return 'MySQL';
+        }
+    }
     
     public function checkEnvironment()
     {

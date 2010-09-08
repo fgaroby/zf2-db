@@ -20,19 +20,25 @@ class ResultSet implements \Iterator, ResultSetInterface
     
     public function __construct(DataSource\DataSourceInterface $dataSource)
     {
-    	$this->_dataSource = $dataSource;
+        if ($dataSource instanceof \Iterator) {
+            $this->_dataSource = $dataSource;
+        } elseif ($dataSource instanceof \IteratorAggregate) {
+            $this->_dataSource->getIterator();
+        } else {
+            throw new \Exception('DataSource provided implements proper interface but does not implement \Iterator nor \IteratorAggregate');
+        }
     }
     
     public function getFieldCount() {}
     
     public function next()
     {
-        $this->_dataSource->next();
+        return $this->_dataSource->next();
     }
     
     public function rewind()
     {
-        $this->_dataSource->rewind();
+        return $this->_dataSource->rewind();
     }
     
     public function key()
@@ -52,7 +58,7 @@ class ResultSet implements \Iterator, ResultSetInterface
     
     public function count()
     {
-    	$this->_dataSource->count();
+    	return $this->_dataSource->count();
     }
 
     

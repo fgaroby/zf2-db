@@ -4,13 +4,15 @@ namespace Zend\Db\Adapter\Driver;
 
 abstract class AbstractDriver
 {
-	protected $_connectionClass = null;
-	protected $_statementClass = null;
-	protected $_resultClass = null;
-    protected $_defaultConnectionParams = array();
-    protected $_defaultStatementParams = array();
-    protected $_defaultResultParams = array();
-    
+    const NAME_FORMAT_CAMELCASE = 'camelCase';
+    const NAME_FORMAT_NATURAL = 'natural';
+	protected $connectionClass = null;
+	protected $statementClass = null;
+	protected $resultClass = null;
+    protected $connectionParams = array();
+    protected $statementParams = array();
+    protected $resultParams = array();
+
     public function __construct($options = array())
     {
     	if ($options) {
@@ -21,11 +23,13 @@ abstract class AbstractDriver
     	    || $this->getStatementClass() == null
     	    || $this->getResultClass() == null
     	    ) {
-    		throw new \Exception('This driver does not have a connection, statement, or result class set.');
+    		throw new \Exception('This extension wrapper does not have a connection, statement, or result class set.');
     	}
     	
     	$this->checkEnvironment();
     }
+    
+    abstract public function getDatabaseVendor($nameFormat = self::NAME_FORMAT_CAMELCASE);
     
     abstract public function checkEnvironment();
     
@@ -40,13 +44,13 @@ abstract class AbstractDriver
     
     public function setConnectionClass($connectionClass)
     {
-    	$this->_connectionClass = $connectionClass;
+    	$this->connectionClass = $connectionClass;
     	return $this;
     }
     
     public function getConnectionClass()
     {
-        return $this->_connectionClass;
+        return $this->connectionClass;
     }
     
     public function setConnectionParams($connectionParams)
@@ -63,13 +67,13 @@ abstract class AbstractDriver
     
     public function setStatementClass($statementClass)
     {
-    	$this->_statementClass = $statementClass;
+    	$this->statementClass = $statementClass;
     	return $this;
     }
 
     public function getStatementClass()
     {
-        return $this->_statementClass;
+        return $this->statementClass;
     }
     
     public function setStatementParams($statementParams)
@@ -86,24 +90,24 @@ abstract class AbstractDriver
     
     public function setResultClass($resultClass)
     {
-        $this->_resultClass = $resultClass;
+        $this->resultClass = $resultClass;
         return $this;
     }
 
     public function getResultClass()
     {
-        return $this->_resultClass;
+        return $this->resultClass;
     }
     
     public function setResultParams($resultClass)
     {
-        $this->_resultClass = $resultClass;
+        $this->resultClass = $resultClass;
         return $this;
     }
     
     public function getResultParams()
     {
-        return $this->_resultClass;
+        return $this->resultClass;
     }
     
 }

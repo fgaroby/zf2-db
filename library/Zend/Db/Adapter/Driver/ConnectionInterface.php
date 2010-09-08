@@ -6,6 +6,9 @@ interface ConnectionInterface
 {
     
     public function __construct(AbstractDriver $driver, array $connectionParameters);
+    public function getConnectionParams();
+    public function getDefaultCatalog();
+    public function getDefaultSchema();
     public function getResource();
     public function connect();
     public function isConnected();
@@ -15,5 +18,4 @@ interface ConnectionInterface
     public function rollback();
     public function execute($sql); // return result set
     public function prepare($sql); // must return StatementInterface object
-    
 }

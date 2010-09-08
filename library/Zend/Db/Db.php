@@ -4,12 +4,10 @@ namespace Zend\Db;
 
 class Db // implements Zend\Application\ResourceContainer?
 {
-    protected static $_adapterRegistry = null;
+    const DEFAULT_ADAPTER = 'defaultAdapter';
+    const DEFAULT_ADAPTER_REGISTRY_CLASS = '\Zend\Db\Adapter\Registry';
     
-    /**
-     * @var \Zend\Db\Adapter\Adapter
-     */
-    protected $_defaultAdapter = null;
+    protected $adapterRegistry = null;
     
     public function __construct($options = array())
     {
@@ -27,49 +25,78 @@ class Db // implements Zend\Application\ResourceContainer?
     	}
     }
     
-    public static function getAdapterRegistry()
+    /**
+     * setAdapterRegistry()
+     * 
+     * @param string|\Zend\Db\Adapter\Registry $registry Class name or instance of \Zend\Db\Adapter\Registry
+     * @param unknown_type $registerWithZendRegistry
+     */
+    public function setAdapterRegistry($registry = self::DEFAULT_ADAPTER_REGISTRY_CLASS, $registerWithZendRegistry = true)
     {
-        if (self::$_adapterRegistry == null) {
-            self::$_adapterRegistry = new Adapter\Registry();
+        if (is_string($registry)) {
+            $registry = new $registry;
         }
-        return self::$_adapterRegistry;
+        if (!$registry instanceof \Zend\Db\Adapter\Registry) {
+            throw new \InvalidArgumentException('Needs to implement adapter registry');
+        }
+        $this->adapterRegistry = $registry;
+        
+        if ($registerWithZendRegistry) {
+            if (\Zend\Registry::hasRegistry(get_class($registry))) {
+                throw new \Exception('Only one adapter registry can be registered with Zend\Registry');
+            }
+            \Zend\Registry::registerRegistry($registry);
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * @return \Zend\Db\Adapter\Registry
+     */
+    public function getAdapterRegistry()
+    {
+        if ($this->adapterRegistry == null) {
+            $this->setAdapterRegistry(self::DEFAULT_ADAPTER_REGISTRY_CLASS);
+        }
+        return $this->adapterRegistry;
     }
     
     public function setAdapter($adapter)
     {
-    	return $this->setDefaultAdapter($adapter);
+        if (is_array($adapter)) {
+            $adapter = new \Zend\Db\Adapter\Adapter($adapter);
+        }
+        
+        if (!($adapter instanceof \Zend\Db\Adapter\Adapter)) {
+            throw new \Exception();
+        }
+        
+        $registry = $this->getAdapterRegistry();
+        $registry->registerAdapter($adapter);
     }
     
-    public function setDefaultAdapter($defaultAdapter)
+    public function setAdapters(array $adapters)
     {
-    	if (is_array($defaultAdapter)) {
-    		$defaultAdapter = new \Zend\Db\Adapter\Adapter($defaultAdapter);
-    	}
-    	
-    	if (!($defaultAdapter instanceof \Zend\Db\Adapter\Adapter)) {
-    		throw new \Exception();
-    	}
-    	
-    	$this->_defaultAdapter = $defaultAdapter;
-    	return $this;
-    }
-    
-    public function getDefaultAdapter()
-    {
-    	return $this->_defaultAdapter;
+        foreach ($adapters as $adapter) {
+            $this->setAdapter($adapter);
+        }
+        return $this;
     }
     
     /**
      * @return \Zend\Db\Adapter\Adapter
      */
-    public function getAdapter()
+    public function getAdapter($adapterName = self::DEFAULT_ADAPTER)
     {
-        return $this->getDefaultAdapter();
+        return $this->getAdapterRegistry()->{$adapterName};
     }
     
-    public function getQuery()
+    public function getQuery($adapterName = self::DEFAULT_ADAPTER)
     {
-        return new \Zend\Db\Query\Query;
+        $query = new \Zend\Db\Query\Query;
+        $query->setAdapter($this->getAdapter($adapterName));
+        return $query;
     }
     
 }

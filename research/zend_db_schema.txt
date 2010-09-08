@@ -1,0 +1,64 @@
+album
+    id
+    artist_id
+    title
+artist
+    id
+    name
+    history
+track
+    id
+    album_id
+    artist_id
+    number
+    title
+    length
+genre
+    id
+    parent_id
+    name
+artist_genre
+    artist_id
+    genre_id
+album_genre
+    album_id
+    genre_id
+track_genre
+    track_id
+    genre_id
+
+
+artist
+
+CREATE TABLE `album` (
+    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    `artist_id` INT NOT NULL ,
+    `title` VARCHAR( 255 ) NOT NULL
+    );
+
+CREATE TABLE `artist` (
+    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    `name` VARCHAR( 255 ) NOT NULL ,
+    `history` TEXT NULL DEFAULT NULL
+    );
+    
+CREATE TABLE `track` (
+    `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+    `artist_id` INT NULL ,
+    `album_id` INT NULL ,
+    `number` INT NULL ,
+    `title` VARCHAR( 255 ) NOT NULL ,
+    `length` INT NOT NULL
+    );
+    
+CREATE TABLE `genre` (
+    `id` INT NOT NULL ,
+    `parent_id` INT NULL DEFAULT NULL ,
+    `name` VARCHAR( 255 ) NOT NULL
+    );
+    
+CREATE TABLE `artist_genre` (
+    `artist_id` INT NOT NULL ,
+    `genre_id` INT NOT NULL ,
+    PRIMARY KEY ( `artist_id` , `genre_id` )
+    );

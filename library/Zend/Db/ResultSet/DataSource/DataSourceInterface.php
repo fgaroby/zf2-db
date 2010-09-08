@@ -2,7 +2,6 @@
 
 namespace Zend\Db\ResultSet\DataSource;
 
-interface DataSourceInterface extends \Iterator, \Countable
+interface DataSourceInterface extends \Traversable, \Countable
 {
-	
 }

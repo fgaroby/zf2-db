@@ -1,26 +1,36 @@
 <?php
 
 namespace Zend\Db\Query\Ddl;
+use \Zend\Db\Query\AbstractQuery;
 
-class Ddl
+class Ddl extends AbstractQuery
 {
     
-    public function createTable($tableName)
+    public function create()
+    {
+        $q = new Create();
+        if ($this->db) {
+            $this->db->prepareObject($q);
+        }
+        return $q;
+    }
+    
+    public function alter()
     {
         
     }
     
-    public function createProcedure($procedureName)
+    public function drop()
     {
         
     }
     
-    public function createView($viewName)
+    public function truncate()
     {
         
     }
     
-    public function createSequence($sequenceName)
+    public function rename()
     {
         
     }

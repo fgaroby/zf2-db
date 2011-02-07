@@ -46,7 +46,7 @@ class Registry extends \ArrayObject
      * Registry object provides storage for shared objects.
      * @var \Zend\Registry
      */
-    protected static $_registryOfRegistries = array();
+    protected static $registryOfRegistries = array();
 
     public static function getGlobalRegistry()
     {
@@ -75,11 +75,11 @@ class Registry extends \ArrayObject
             $name = '\\' . get_class($registry);
         }
         
-        if (array_key_exists($name, static::$_registryOfRegistries)) {
+        if (array_key_exists($name, static::$registryOfRegistries)) {
             throw new \Exception('Registry by name ' . $name . ' is already registered.');
         }
         
-        static::$_registryOfRegistries[$name] = $registry;
+        static::$registryOfRegistries[$name] = $registry;
     }
     
     public static function hasRegistry($name = self::USE_CALLED_CLASS)
@@ -88,7 +88,7 @@ class Registry extends \ArrayObject
             $name = '\\' . get_called_class();
         }
         
-        return isset(static::$_registryOfRegistries[$name]);
+        return isset(static::$registryOfRegistries[$name]);
     }
     
     public static function getRegistry($name = self::USE_CALLED_CLASS)
@@ -101,7 +101,7 @@ class Registry extends \ArrayObject
             return false;
         }
         
-        return static::$_registryOfRegistries[$name];
+        return static::$registryOfRegistries[$name];
     }
     
     public static function unregisterRegistry($nameOrRegistry = self::USE_CALLED_CLASS)
@@ -111,11 +111,11 @@ class Registry extends \ArrayObject
         }
         
         if (is_string($nameOrRegistry)) {
-            unset(static::$_registryOfRegistries[$nameOrRegistry]);
+            unset(static::$registryOfRegistries[$nameOrRegistry]);
         } elseif ($nameOrRegistry instanceof \Zend\Registry) {
-            $key = array_search($nameOrRegistry, static::$_registryOfRegistries);
+            $key = array_search($nameOrRegistry, static::$registryOfRegistries);
             if ($key) {
-                unset(static::$_registryOfRegistries[$key]);
+                unset(static::$registryOfRegistries[$key]);
             }
         }
     }

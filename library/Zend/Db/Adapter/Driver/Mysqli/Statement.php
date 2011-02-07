@@ -1,17 +1,23 @@
 <?php
 
-namespace Zend\Db\Adapter\Driver\MySQLi;
+namespace Zend\Db\Adapter\Driver\Mysqli;
 use Zend\Db\Adapter\Driver;
 
 class Statement implements Driver\StatementInterface
 {
-    protected $_driver = null;
-    protected $_resource = null;
+    protected $adapter = null;
+    protected $driver = null;
+    protected $resource = null;
     
-    public function __construct(Driver\AbstractDriver $driver, $defaultOptions, \mysqli_stmt $mysqliStmt)
+    public function __construct(Driver\AbstractDriver $driver, array $defaultOptions, \mysqli_stmt $resource = null)
     {
-        $this->_driver = $driver;
-        $this->_resource = $mysqliStmt;
+        $this->driver = $driver;
+        $this->resource = $resource;
+    }
+    
+    public function setAdapter(\Zend\Db\Adapter\Adapter $adapter)
+    {
+        $this->adapter = $adapter;
     }
     
     public function getResource() {}

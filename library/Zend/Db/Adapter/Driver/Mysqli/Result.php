@@ -14,6 +14,10 @@ class Result implements \Iterator, Driver\ResultInterface
 	 * @var \mysqli_result
 	 */
 	protected $resource = null;
+	
+	/**
+     * @var array
+	 */
 	protected $data = array();
 	protected $pointerPosition = 0;
 	protected $numberOfRows = -1;

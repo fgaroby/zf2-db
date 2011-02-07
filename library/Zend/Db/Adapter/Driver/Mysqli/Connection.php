@@ -1,12 +1,14 @@
 <?php
 
 namespace Zend\Db\Adapter\Driver\Mysqli;
-use Zend\Db\Adapter\Driver;
+use Zend\Db\Adapter\Driver,
+    Zend\Db\Adapter\Exception;
+
 
 class Connection implements Driver\ConnectionInterface
 {
 	/**
-	 * @var \Zend\Db\Adapter\Driver\DriverAbstract
+	 * @var \Zend\Db\Adapter\Driver\AbstractDriver
 	 */
 	protected $driver = null;
 	
@@ -139,11 +141,12 @@ class Connection implements Driver\ConnectionInterface
     	
     	$returnValue = $this->resource->query($sql);
     	
+    	// if the returnValue is something other than a mysqli_result, bypass wrapping it
     	if ($returnValue instanceof \mysqli_result) {
-            $this->openMysqliResultSets[] = $result = new \Zend\Db\ResultSet\ResultSet(
-               new $resultClass($this->driver, array(), $returnValue)
-               );
+            $this->openMysqliResultSets[] = $result = new $resultClass($this->driver, array(), $returnValue);
             return $result;
+    	} elseif ($returnValue === false) {
+    	    throw new Exception\InvalidQueryException($this->resource->error);
     	}
     	
         return $returnValue;
@@ -157,7 +160,12 @@ class Connection implements Driver\ConnectionInterface
         
         $statementClass = $this->driver->getStatementClass();
         
-        $statement = new $statementClass($this->driver, array(), $this->resource->prepare($sql));
+        $mysqliStatement = $this->resource->prepare($sql);
+        if ($mysqliStatement === false) {
+            throw new \Exception($this->resource->error);
+        }
+        
+        $statement = new $statementClass($this->driver, array(), $mysqliStatement);
 
         return $statement;
     }

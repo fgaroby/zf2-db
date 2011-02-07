@@ -6,12 +6,15 @@ abstract class AbstractDriver
 {
     const NAME_FORMAT_CAMELCASE = 'camelCase';
     const NAME_FORMAT_NATURAL = 'natural';
+    protected $adapter = null;
 	protected $connectionClass = null;
 	protected $statementClass = null;
 	protected $resultClass = null;
     protected $connectionParams = array();
     protected $statementParams = array();
     protected $resultParams = array();
+    
+    protected $connection = null;
 
     public function __construct($options = array())
     {
@@ -29,7 +32,7 @@ abstract class AbstractDriver
     	$this->checkEnvironment();
     }
     
-    abstract public function getDatabaseVendor($nameFormat = self::NAME_FORMAT_CAMELCASE);
+    abstract public function getDatabasePlatformName($nameFormat = self::NAME_FORMAT_CAMELCASE);
     
     abstract public function checkEnvironment();
     
@@ -40,6 +43,11 @@ abstract class AbstractDriver
                 $this->{'set' . $optionName}($optionValue);
             }
         }
+    }
+    
+    public function setAdapter(\Zend\Db\Adapter\Adapter $adapter)
+    {
+        $this->adapter = $adapter;
     }
     
     public function setConnectionClass($connectionClass)
@@ -109,5 +117,36 @@ abstract class AbstractDriver
     {
         return $this->resultClass;
     }
+    
+
+    /**
+     * setConnection()
+     * 
+     * @param $connection
+     */
+    public function setConnection(ConnectionInterface $connection)
+    {
+    	$this->connection = $connection;
+    	return $this;
+    }
+    
+    /**
+     * getConnection()
+     * 
+     * This method will attempt to lazy-load the connection object if
+     * if does not already exist in the adatper.
+     * 
+     * @return \Zend\Db\Adapter\Driver\ConnectionInterface
+     */
+    public function getConnection()
+    {
+    	if ($this->connection == null) {
+	    	$connectionClass = $this->getConnectionClass();
+	        $this->setConnection(new $connectionClass($this, $this->getConnectionParams()));
+    	}
+    	return $this->connection;
+    }
+
+    
     
 }

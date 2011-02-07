@@ -48,7 +48,7 @@ set_include_path(implode(PATH_SEPARATOR, $path));
 
 // setup the test autoloader
 require_once 'ZendTest/TestAsset/TestAutoloader.php';
-spl_autoload_register(array(new \ZendTest\TestAsset\TestAutoloader, 'autoload'), true, true);
+spl_autoload_register(new \ZendTest\TestAsset\TestAutoloader, true, true);
 
 /*
  * Load the user-defined test configuration file, if it exists; otherwise, load

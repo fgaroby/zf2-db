@@ -3,12 +3,18 @@
 /* @var $db Zend\Db\Db */
 $db = include_once 'bootstrap.php';
 
-$a = $db->getAdapter();
+use Zend\Db\Metadata\Factory as MetadataFactory;
+use Zend\Db\Metadata\Display as MetadataDisplay;
 
-$metadataFactory = new Zend\Db\Metadata\Factory\Factory;
-$metadata = $metadataFactory->createFromScanner(new Zend\Db\Metadata\Factory\Scanner\InformationSchemaScanner($a));
+$adapter = $db->getAdapter();
 
-var_dump($metadata);
+$metadataFactory = new MetadataFactory\Factory;
+$metadataFactory->setSchemaFilter($adapter->getConnection()->getDefaultSchema());
+$metadata = $metadataFactory->createFromScanner(
+    new MetadataFactory\Scanner\InformationSchemaScanner($adapter)
+    );
 
-//$adapter = $db->getAdapter();
+$display = new MetadataDisplay\TextUi();
+echo $display->render($metadata);
+
 

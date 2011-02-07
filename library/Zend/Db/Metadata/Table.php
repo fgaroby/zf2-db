@@ -2,24 +2,62 @@
 
 namespace Zend\Db\Metadata;
 
-class Table
+class Table extends AbstractMetadata
 {
-    protected $name = null;
-    protected $columns = null;
+    protected $catalogName = null;
+    protected $schemaName = null;
+    protected $type = null;
+    
+    protected $columnCollection = null;
+    protected $constraintCollection = null;
     
     public function __construct()
     {
-        $this->columns = new ColumnCollection();
+        $this->columnCollection = new ColumnCollection();
+        $this->constraintCollection = new ConstraintCollection();
     }
     
-    public function setName($name)
+    public function getCatalogName()
     {
-        $this->name = $name;
+        return $this->catalogName;
     }
     
-    public function setColumn(Column $column)
+    public function setCatalogName($catalogName)
     {
-        $this->column[] = $column;
+        $this->catalogName = $catalogName;
+        return $this;
+    }
+    
+    public function getSchemaName()
+    {
+        return $this->schemaName;
+    }
+    
+    public function setSchemaName($schemaName)
+    {
+        $this->schemaName = $schemaName;
+        return $this;
+    }
+    
+    public function getType()
+    {
+        return $this->type;
+    }
+    
+    public function setType($type)
+    {
+        $this->type = $type;
+        return $this;
+    }
+    
+    public function getColumnCollection()
+    {
+        return $this->columnCollection;
+    }
+    
+    public function getConstraintCollection()
+    {
+        return $this->constraintCollection;
     }
     
 }

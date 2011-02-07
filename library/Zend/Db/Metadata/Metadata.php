@@ -4,26 +4,45 @@ namespace Zend\Db\Metadata;
 
 class Metadata
 {
-    protected $defaultCatalog = null;
-    protected $defaultSchema = null;
     
-    protected $catalogs = array();
-    protected $schemas = array();
-    protected $tables = array();
+    protected $catalogName = null;
+    protected $schemaName = null;
     
-    public function getTable($tableName, $schemaName = null, $catalogName = null)
+    protected $tableCollection = null;
+    protected $viewCollection = null;
+    protected $referentialConstraintCollection = null;
+    protected $triggerCollection = null;
+
+    
+    public function __construct()
     {
-        
+        $this->tableCollection = new TableCollection();
+        $this->viewCollection = new ViewCollection();
+        $this->referentialConstraintCollection = new ReferentialConstraintCollection();
+        $this->triggerCollection = new TriggerCollection();
     }
     
-    public function getTrigger($triggerName, $schemaName = null, $catalogName = null)
+    public function getTableCollection()
     {
-        
+        return $this->tableCollection;
     }
     
-    public function getView($viewName, $schemaName = null, $catalogName = null)
+    public function getViewCollection()
     {
-        
+        return $this->viewCollection;
+    }
+    
+    /**
+	 * @return Zend\Db\Metadata\ReferentialConstraintCollection
+     */
+    public function getReferentialConstraintCollection()
+    {
+        return $this->referentialConstraintCollection;
+    }
+    
+    public function getTriggerCollection()
+    {
+        return $this->triggerCollection;
     }
     
 }

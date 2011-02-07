@@ -2,106 +2,88 @@
 
 namespace Zend\Db\Metadata;
 
-class Column
+class Column extends AbstractMetadata
 {
-    protected $catalog = null;
-    protected $schema = null;
-    protected $table = null;
-    protected $name = null;
-    protected $ordinalPostion = null;
+    protected $catalogName = null;
+    protected $schemaName = null;
+    protected $tableName = null;
+    protected $ordinalPosition = null;
     protected $columnDefault = null;
     protected $isNullable = null;
     protected $dataType = null;
     protected $characterMaximumLength = null;
     protected $characterOctetLength = null;
-    protected $numericPrevision = null;
+    protected $numericPrecision = null;
     protected $numericScale = null;
     protected $characterSetName = null;
     protected $collationName = null;
     protected $errata = array();
+
     
-	/**
-     * @return the $catalog
-     */
-    public function getCatalog()
+    public function setOptions(Array $options)
     {
-        return $this->catalog;
+        foreach ($options as $optionName => $optionValue) {
+            if (method_exists($this, 'set' . $optionName)) {
+                $this->{'set' . $optionName}($optionValue);
+            } else {
+                $this->setErrata($optionName, $optionValue);
+            }
+        }
     }
 
-	/**
-     * @param $catalog the $catalog to set
-     */
-    public function setCatalog($catalog)
+    public function getCatalogName()
     {
-        $this->catalog = $catalog;
+        return $this->catalogName;
+    }
+    
+    public function setCatalogName($catalogName)
+    {
+        $this->catalogName = $catalogName;
         return $this;
     }
-
-	/**
-     * @return the $schema
-     */
-    public function getSchema()
+    
+    public function getSchemaName()
     {
-        return $this->schema;
+        return $this->schemaName;
     }
-
-	/**
-     * @param $schema the $schema to set
-     */
-    public function setSchema($schema)
+    
+    public function setSchemaName($schemaName)
     {
-        $this->schema = $schema;
+        $this->schemaName = $schemaName;
         return $this;
     }
 
 	/**
      * @return the $table
      */
-    public function getTable()
+    public function getTableName()
     {
-        return $this->table;
+        return $this->tableName;
     }
 
 	/**
      * @param $table the $table to set
      */
-    public function setTable($table)
+    public function setTableName($tableName)
     {
-        $this->table = $table;
+        $this->tableName = $tableName;
         return $this;
     }
 
 	/**
-     * @return the $name
+     * @return the $ordinalPosition
      */
-    public function getName()
+    public function getOrdinalPosition()
     {
-        return $this->name;
+        return $this->ordinalPosition;
     }
 
 	/**
-     * @param $name the $name to set
+     * @param $ordinalPosition the $ordinalPosition to set
      */
-    public function setName($name)
+    public function setOrdinalPosition($ordinalPosition)
     {
-        $this->name = $name;
-        return $this;
-    }
-
-	/**
-     * @return the $ordinalPostion
-     */
-    public function getOrdinalPostion()
-    {
-        return $this->ordinalPostion;
-    }
-
-	/**
-     * @param $ordinalPostion the $ordinalPostion to set
-     */
-    public function setOrdinalPostion($ordinalPostion)
-    {
-        $this->ordinalPostion = $ordinalPostion;
+        $this->ordinalPosition = $ordinalPosition;
         return $this;
     }
 
@@ -191,19 +173,19 @@ class Column
     }
 
 	/**
-     * @return the $numericPrevision
+     * @return the $numericPrecision
      */
-    public function getNumericPrevision()
+    public function getNumericPrecision()
     {
-        return $this->numericPrevision;
+        return $this->numericPrecision;
     }
 
 	/**
      * @param $numericPrevision the $numericPrevision to set
      */
-    public function setNumericPrevision($numericPrevision)
+    public function setNumericPrecision($numericPrecision)
     {
-        $this->numericPrevision = $numericPrevision;
+        $this->numericPrecision = $numericPrecision;
         return $this;
     }
 
@@ -261,7 +243,7 @@ class Column
 	/**
      * @return the $errata
      */
-    public function getErrata()
+    public function getErratas()
     {
         return $this->errata;
     }
@@ -269,9 +251,9 @@ class Column
 	/**
      * @param $errata the $errata to set
      */
-    public function setErrata($errata)
+    public function setErrata($errataName, $errataValue)
     {
-        $this->errata = $errata;
+        $this->errata[$errataName] = $errataValue;
         return $this;
     }
 

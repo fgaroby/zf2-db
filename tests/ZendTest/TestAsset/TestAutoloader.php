@@ -4,6 +4,11 @@ namespace ZendTest\TestAsset;
 
 class TestAutoloader
 {
+    public function __invoke($class)
+    {
+        return $this->autoload($class);
+    }
+    
     function autoload($class) 
     {
         $class = ltrim($class, '\\');

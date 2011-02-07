@@ -2,7 +2,7 @@
 
 namespace ZendTest\Db\TestAsset;
 
-abstract class TestCase extends \PHPUnit_Framework_TestCase
+abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
     const ADAPTER_GENERAL = 'general';
     const ADAPTER_MYSQL_VIA_PREFERRED = 'mysqlViaPreferred';
@@ -12,16 +12,16 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var Zend\Db\Db
      */
-    protected $zendDb = null;
+    protected $db = null;
     
-    public function setZendDb(\Zend\Db\Db $zendDb)
+    public function setZendDb(\Zend\Db\Db $db)
     {
-        $this->zendDb = $zendDb;
+        $this->db = $db;
     }
     
     public function requireAdapter($adapterName = self::ADAPTER_GENERAL)
     {
-        $adapterRegistry = $this->zendDb->getAdapterRegistry();
+        $adapterRegistry = $this->db->getAdapterRegistry();
         if (!$adapterRegistry->offsetExists($adapterName)) {
             $this->markTestSkipped('Skipping this test since the adapter ' . $adapterName . ' is not available');
         }

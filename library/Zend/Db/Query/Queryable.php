@@ -2,9 +2,10 @@
 
 namespace Zend\Db\Query;
 
-interface QueryInterface
+interface Queryable
 {
     
+    public function isValue();
     public function toSql();
     
 }

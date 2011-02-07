@@ -9,7 +9,7 @@ class Mysqli extends Driver\AbstractDriver
     protected $statementClass = '\Zend\Db\Adapter\Driver\Mysqli\Statement';
     protected $resultClass = '\Zend\Db\Adapter\Driver\Mysqli\Result';
     
-    public function getDatabaseVendor($nameFormat = self::NAME_FORMAT_CAMELCASE)
+    public function getDatabasePlatformName($nameFormat = self::NAME_FORMAT_CAMELCASE)
     {
         if ($nameFormat == self::NAME_FORMAT_CAMELCASE) {
             return 'Mysql';

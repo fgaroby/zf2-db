@@ -1,9 +1,16 @@
 <?php
 
-namespace Zend\Db\Adapter;
+namespace Zend\Db;
+use \Zend\Db\Adapter\Adapter;
 
 class Registry extends \Zend\Registry
 {
+    const DEFAULT_ADAPTER_NAME = 'defaultAdapter';
+    
+    protected $reservedKeys = array(
+        self::DEFAULT_ADAPTER_NAME,
+        'eventManager',
+        );
     
     protected $defaultAdapterName = null;
     
@@ -11,7 +18,7 @@ class Registry extends \Zend\Registry
     {
         $name = $adapter->getName();
         
-        if ($name == 'defaultAdapter') {
+        if ($name == self::DEFAULT_ADAPTER_NAME) {
             throw new \InvalidArgumentException('The name "defaultAdapter" is a reserved key and cannot be used in this registry.');
         }
         
@@ -37,13 +44,26 @@ class Registry extends \Zend\Registry
             throw new \InvalidArgumentException('Adapter or adapter name provided is not in this registry, cannot be marked as default');
         }
         
-        $this->offsetSet('defaultAdapter', $this->offsetGet($adapter));
+        $this->offsetSet(self::DEFAULT_ADAPTER_NAME, $this->offsetGet($adapter));
         $this->defaultAdapterName = $adapter;
     }
     
     public function getDefaultAdapter()
     {
-        return $this->offsetGet($this->_defaultAdapter);
+        return $this->offsetGet($this->{self::DEFAULT_ADAPTER_NAME});
+    }
+    
+    public function setPluginManager(\Zend\Db\Plugin\PluginManager $pluginManager)
+    {
+        $this->offsetSet('pluginManager', $pluginManager);
+    }
+    
+    public function getPluginManager()
+    {
+        if (!$this->offsetExists('pluginManager')) {
+            $this->setPluginManager(new \Zend\Db\Plugin\PluginManager);
+        }
+        return $this->offsetGet('pluginManager');
     }
     
 }

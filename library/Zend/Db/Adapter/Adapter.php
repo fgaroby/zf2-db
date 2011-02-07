@@ -21,10 +21,11 @@ class Adapter
 	 */
     protected $driver = null;
     
-    /**
-     * @var \Zend\Db\Adapter\Driver\ConnectionInterface
-     */
-    protected $connection = null;
+    protected $queryMode = self::QUERY_PREPARE;
+    
+    protected $queryReturnClass = '\Zend\Db\ResultSet\ResultSet';
+    
+    protected $platform = null;
     
     public function __construct($options = array())
     {
@@ -119,38 +120,31 @@ class Adapter
     	return $this->driver;
     }
     
-    /**
-     * setConnection()
-     * 
-     * @param $connection
-     */
-    public function setConnection(Driver\ConnectionInterface $connection)
+    public function setQueryMode($queryMode)
     {
-    	$this->connection = $connection;
-    	return $this;
+        if (!in_array($queryMode, array(self::QUERY_EXECUTE, self::QUERY_PREPARE))) {
+            throw new \InvalidArgumentException('mode must be one of query_execute or query_prepare');
+        }
+        
+        $this->queryMode = $queryMode;
+        return $this;
+    }
+
+    public function getPlatform()
+    {
+        if (!isset($this->platform)) {
+            $this->platform = new Platform\Mysql\Mysql;
+        }
     }
     
     /**
-     * getConnection()
+     * query() is a convienince function
      * 
-     * This method will attempt to lazy-load the connection object if
-     * if does not already exist in the adatper.
-     * 
-     * @return \Zend\Db\Adapter\Driver\ConnectionInterface
+     * @return Zend\Db\ResultSet\ResultSetInterface
      */
-    public function getConnection()
-    {
-    	if ($this->connection == null) {
-    		$driver = $this->getDriver();
-	    	$connectionClass = $driver->getConnectionClass();
-	        $this->setConnection(new $connectionClass($driver, $this->driver->getConnectionParams()));
-    	}
-    	return $this->connection;
-    }
-
     public function query($sql, $prepareOrExecute = self::QUERY_PREPARE)
     {
-        $c = $this->getConnection();
+        $c = $this->getDriver()->getConnection();
         return ($prepareOrExecute == self::QUERY_EXECUTE) ? $c->execute($sql) : $c->prepare($sql);
     }
 

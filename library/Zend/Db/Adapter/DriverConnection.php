@@ -1,10 +1,9 @@
 <?php
 
-namespace Zend\Db\Adapter\Driver;
+namespace Zend\Db\Adapter;
 
-interface ConnectionInterface
+interface DriverConnection
 {
-    
     public function __construct(AbstractDriver $driver, array $connectionParameters);
     public function getConnectionParams();
     public function getDefaultCatalog();
@@ -17,5 +16,9 @@ interface ConnectionInterface
     public function commit();
     public function rollback();
     public function execute($sql); // return result set
+    
+    /**
+     * @return Zend\Db\Adapter\DriverStatement
+     */
     public function prepare($sql); // must return StatementInterface object
 }

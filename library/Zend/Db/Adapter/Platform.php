@@ -1,8 +1,8 @@
 <?php
 
-namespace Zend\Db\Adapter\Platform;
+namespace Zend\Db\Adapter;
 
-interface PlatformInterface
+interface Platform
 {
     public function getName();
     

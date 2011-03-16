@@ -1,11 +1,9 @@
 <?php
 
-namespace Zend\Db\Adapter\Driver;
+namespace Zend\Db\Adapter;
 
-abstract class AbstractDriver
+abstract class AbstractDriver implements Driver
 {
-    const NAME_FORMAT_CAMELCASE = 'camelCase';
-    const NAME_FORMAT_NATURAL = 'natural';
     protected $adapter = null;
 	protected $connectionClass = null;
 	protected $statementClass = null;
@@ -32,10 +30,6 @@ abstract class AbstractDriver
     	$this->checkEnvironment();
     }
     
-    abstract public function getDatabasePlatformName($nameFormat = self::NAME_FORMAT_CAMELCASE);
-    
-    abstract public function checkEnvironment();
-    
     public function setOptions(array $options)
     {
         foreach ($options as $optionName => $optionValue) {
@@ -45,7 +39,7 @@ abstract class AbstractDriver
         }
     }
     
-    public function setAdapter(\Zend\Db\Adapter\Adapter $adapter)
+    public function setAdapter(\Zend\Db\Adapter $adapter)
     {
         $this->adapter = $adapter;
     }
@@ -118,13 +112,22 @@ abstract class AbstractDriver
         return $this->resultClass;
     }
     
+    public function getPrepareTypeSupport()
+    {
+        return array(\Zend\Db\Adapter::PREPARE_TYPE_POSITIONAL);
+    }
+    
+    public function formatNamedParameter($name)
+    {
+        throw new \Exception('This Driver does not support named parameters');
+    }
 
     /**
      * setConnection()
      * 
      * @param $connection
      */
-    public function setConnection(ConnectionInterface $connection)
+    public function setConnection(DriverConnection $connection)
     {
     	$this->connection = $connection;
     	return $this;

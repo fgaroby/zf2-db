@@ -1,11 +1,10 @@
 <?php
 
 namespace Zend\Db\Adapter\Driver\Mysqli;
-use Zend\Db\Adapter\Driver,
-    Zend\Db\Adapter\Exception;
+use Zend\Db\Adapter;
 
 
-class Connection implements Driver\ConnectionInterface
+class Connection implements Adapter\DriverConnection
 {
 	/**
 	 * @var \Zend\Db\Adapter\Driver\AbstractDriver
@@ -23,7 +22,7 @@ class Connection implements Driver\ConnectionInterface
     
     protected $openMysqliResultSets = array();
     
-    public function __construct(Driver\AbstractDriver $driver, array $connectionParameters)
+    public function __construct(Adapter\AbstractDriver $driver, array $connectionParameters)
     {
         $this->driver = $driver;
         $this->connectionParams = $connectionParameters;
@@ -146,7 +145,7 @@ class Connection implements Driver\ConnectionInterface
             $this->openMysqliResultSets[] = $result = new $resultClass($this->driver, array(), $returnValue);
             return $result;
     	} elseif ($returnValue === false) {
-    	    throw new Exception\InvalidQueryException($this->resource->error);
+    	    throw new \Zend\Db\Adapter\Exception\InvalidQueryException($this->resource->error);
     	}
     	
         return $returnValue;
@@ -166,7 +165,8 @@ class Connection implements Driver\ConnectionInterface
         }
         
         $statement = new $statementClass($this->driver, array(), $mysqliStatement);
-
+        $statement->setSql($sql);
+        
         return $statement;
     }
 

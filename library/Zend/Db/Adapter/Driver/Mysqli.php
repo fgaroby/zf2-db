@@ -1,13 +1,12 @@
 <?php
 
-namespace Zend\Db\Adapter\Driver\Mysqli;
-use Zend\Db\Adapter\Driver;
+namespace Zend\Db\Adapter\Driver;
 
-class Mysqli extends Driver\AbstractDriver
+class Mysqli extends \Zend\Db\Adapter\AbstractDriver
 {
-    protected $connectionClass = '\Zend\Db\Adapter\Driver\Mysqli\Connection';
-    protected $statementClass = '\Zend\Db\Adapter\Driver\Mysqli\Statement';
-    protected $resultClass = '\Zend\Db\Adapter\Driver\Mysqli\Result';
+    protected $connectionClass = 'Zend\Db\Adapter\Driver\Mysqli\Connection';
+    protected $statementClass = 'Zend\Db\Adapter\Driver\Mysqli\Statement';
+    protected $resultClass = 'Zend\Db\Adapter\Driver\Mysqli\Result';
     
     public function getDatabasePlatformName($nameFormat = self::NAME_FORMAT_CAMELCASE)
     {
@@ -24,4 +23,5 @@ class Mysqli extends Driver\AbstractDriver
             throw new \Exception('The Mysqli extension is required for this adapter but the extension is not loaded');
         }
     }
+    
 }

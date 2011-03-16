@@ -1,9 +1,9 @@
 <?php
 
 namespace Zend\Db\Adapter\Driver\Mysqli;
-use Zend\Db\Adapter\Driver;
 
-class Result implements \Iterator, Driver\ResultInterface
+
+class Result implements \Iterator, \Zend\Db\Adapter\DriverResult
 {
     /**
      * @var Zend\Db\Adapter\Driver\AbstractDriver
@@ -24,7 +24,7 @@ class Result implements \Iterator, Driver\ResultInterface
 	protected $nextImpliedByCurrent = false;
 	protected $loadedRows = 0;
 	
-	public function __construct(Driver\AbstractDriver $driver, array $defaultOptions, \mysqli_result $mysqliResult = null)
+	public function __construct(\Zend\Db\Adapter\Driver $driver, array $defaultOptions, \mysqli_result $mysqliResult = null)
 	{
 	   $this->driver = $driver; 
 	   $this->resource = $mysqliResult;

@@ -2,13 +2,23 @@
 
 namespace Zend\Db\Adapter\DriverStatement;
 
-class ParameterContainer extends \ArrayObject
+interface ParameterContainer extends \ArrayAccess, \Countable, \Traversable
 {
-    protected $source = array();
+    const TYPE_AUTO = 'auto';
+    const TYPE_NULL = 'null';
+    const TYPE_DOUBLE = 'double';
+    const TYPE_INTEGER = 'integer';
+    const TYPE_STRING = 'string';
+    const TYPE_LOB = 'lob';
     
-    public function __construct(Array $array = array(), $flags = \ArrayObject::ARRAY_AS_PROPS)
-    {
-        $this->source = array_merge($this->source, $array);
-        parent::__construct(&$this->source, $flags);
-    }
+    public function __construct($definition = null);
+    
+    public function setFromArray(Array $values);
+    public function offsetSet($offset, $value, $errata = null);
+    
+    public function offsetSetErrata($offset, $errata);
+    public function offsetGetErrata($offset);
+    public function offsetHasErrata($offset);
+    public function offsetUnsetErrata($offset);
+    public function getErrataIterator();
 }

@@ -8,6 +8,8 @@ class Statement implements \Zend\Db\Adapter\DriverStatement
     protected $driver = null;
     protected $sql = null;
     
+    protected $parameterContainer = null;
+    
     protected $boundParameterTypes = array();
     protected $boundParamValues = array();
     
@@ -49,7 +51,7 @@ class Statement implements \Zend\Db\Adapter\DriverStatement
         return $this->sql;
     }
     
-    public function execute()
+    public function execute($parameters = null)
     {
         $this->buildCombinedBindParamCall();
 
